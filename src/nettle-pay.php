@@ -69,7 +69,7 @@ function nettle_pay_init() {
                     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
                 }
 
-                add_action('woocommerce_api_wc_gateway_nettle_pay', array($this, 'check_ipn_response'));
+                add_action('woocommerce_api_nettle_pay_webhook', array($this, 'check_ipn_response'));
             }
 
             /**
@@ -88,11 +88,20 @@ function nettle_pay_init() {
              * Handle requests sent to webhook.
              */
             public function check_ipn_response() {
-                $order = wc_get_order($_GET['id']);
+                $order_id = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : null;
+                $nonce = isset($_REQUEST['nonce']) ? $_REQUEST['nonce'] : null;
+
+                if (is_null($order_id)) return;
+
+                if (is_null($nonce)) return;
+
+                if (wc_get_order_item_meta($order_id, 'ipn_nonce') != $nonce) return;
+
+                $order = wc_get_order($order_id);
                 $order->payment_complete();
                 $order->reduce_order_stock();
 
-                update_option('webhook_debug', $_GET);
+                update_option('webhook_debug', $_REQUEST);
             }
 
             /**
@@ -200,6 +209,11 @@ function nettle_pay_init() {
                     throw new \Exception('Unable to retrieve the order details for order ID "' . $order_id . '", Unable to proceed.');
                 }
 
+                // create a nonce to use on the callback url
+                $nonce = substr(str_shuffle(md5(microtime())), 0, 12);
+
+                wc_add_order_item_meta($order_id, 'ipn_nonce', $nonce);
+
                 $this->init_api();
 
                 self::log('[INFO] process_payment(): getting currency details for "' . get_woocommerce_currency() . '"...');
@@ -214,6 +228,7 @@ function nettle_pay_init() {
                 self::log('[INFO] process_payment(): got currency response: ' . print_r($response, true));
 
                 $requestParams = array(
+                    "callbackUrl" => get_bloginfo('url') . '/?wc-api=nettle_pay_webhook&nonce=' . $nonce . '&order_id=' . $order_id,
                     "cancelUrl" => $this->get_cancel_url($order),
                     "payment" => array(
                         "atomicAmount" => $order->get_total() * pow(10, $response['decimal']),
