@@ -8,7 +8,7 @@ class Nettle_API_Handler {
     public static $api_key_secret;
 
     /** @var string Nettle Pay API url. */
-    public static $base_url = 'http://nettle_api:3000';
+    public static $api_url;
 
     /** @var string/array Log variable function. */
     public static $log;
@@ -29,7 +29,7 @@ class Nettle_API_Handler {
             'headers' => $headers,
             'timeout' => 120
         );
-        $response = wp_remote_post(self::$base_url.'/checkout/payment', $args);
+        $response = wp_remote_post(self::$api_url.'/checkout/payment', $args);
 
         if (is_wp_error($response)) {
             self::log("[INFO] HTTP Failed: " . $response->get_error_message());
@@ -59,7 +59,7 @@ class Nettle_API_Handler {
             'headers' => $headers,
             'timeout' => 120
         );
-        $response = wp_remote_get(self::$base_url . '/currency/' . $currencyCode, $args);
+        $response = wp_remote_get(self::$api_url . '/currency/' . $currencyCode, $args);
 
         if (is_wp_error($response)) {
             self::log("[INFO] HTTP failed: " . $response->get_error_message());
