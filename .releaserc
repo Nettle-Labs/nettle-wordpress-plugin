@@ -1,0 +1,28 @@
+{
+  "branches": "main",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "./bin/update_readme.sh ${nextRelease.version}",
+          "publishCmd": "./bin/build.sh"
+        }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["src/README.txt", "CHANGELOG.md"],
+        "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": ["dist/nettle-pay-for-woocommerce.zip"]
+      }
+    ],
+  ]
+}

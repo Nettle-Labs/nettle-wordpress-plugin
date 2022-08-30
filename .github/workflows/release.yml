@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: "🛎 Checkout"
+        uses: actions/checkout@v3
+      - name: "🔧 Setup"
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      - name: "📦 Install"
+        run: npm install semantic-release @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/exec @semantic-release/git @semantic-release/github @semantic-release/release-notes-generator --no-save
+      - name: "🔖 Release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
