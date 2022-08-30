@@ -9,5 +9,34 @@
 </h1>
 
 <p align="center">
-  Nettle Pay is a payment provider that allows your customers to pay with cryptocurrency, get rewarded and reduce your CO2e emissions.  
+  Nettle Pay for WooCommerce is a plugin that can be used on a merchant's WordPress site that uses WooCommerce for their e-commerce solution.
 </p>
+
+### Table of contents
+
+* [Development](#-development)
+* [How to Contribute](#-how-to-contribute)
+* [License](#-license)
+
+## 🛠️ Development
+
+Coming soon...
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
+## 👏 How to Contribute
+
+Please read the [**Contributing Guide**][contribute] to learn about the development process.
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
+## 📄 License
+
+Please refer to the [LICENSE][license] file.
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
+<!-- Links -->
+[contribute]: ./CONTRIBUTING.md
+[license]: ./LICENSE
+[table-of-contents]: #table-of-contents
