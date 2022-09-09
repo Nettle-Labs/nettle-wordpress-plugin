@@ -88,14 +88,24 @@ function nettle_pay_init() {
              * Handle requests sent to webhook.
              */
             public function check_ipn_response() {
-                $order_id = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : null;
-                $nonce = isset($_REQUEST['nonce']) ? $_REQUEST['nonce'] : null;
+                $order_id = isset($_REQUEST['order_id']) ? sanitize_title($_REQUEST['order_id']) : null;
+                $nonce = isset($_REQUEST['nonce']) ? sanitize_title($_REQUEST['nonce']) : null;
 
-                if (is_null($order_id)) return;
+                if (is_null($order_id)) {
+                    self::log('[INFO] check_ipn_response(): no order id found');
+                    return;
+                }
 
-                if (is_null($nonce)) return;
+                if (is_null($nonce)) {
+                    self::log('[INFO] check_ipn_response(): no nonce found');
+                    return;
+                }
 
-                if (wc_get_order_item_meta($order_id, 'ipn_nonce') != $nonce) return;
+                // check the nonce in the order metadata matches the incoming nonce
+                if (wc_get_order_item_meta($order_id, 'ipn_nonce') != $nonce) {
+                    self::log('[INFO] check_ipn_response(): the incoming nonce does not match the nonce of the order');
+                    return;
+                }
 
                 $order = wc_get_order($order_id);
                 $order->payment_complete();
