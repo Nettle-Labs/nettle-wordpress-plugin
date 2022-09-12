@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.1.0...v1.2.0) (2022-09-12)
+
+
+### Features
+
+* update word press plugin to comply with submission review ([#2](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/2)) ([87a468e](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/87a468e51643f5754c7b2f813ab4f240a77da208))
+
 # [1.1.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.0.0...v1.1.0) (2022-09-02)
 
 
