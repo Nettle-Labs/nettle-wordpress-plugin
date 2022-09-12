@@ -21,7 +21,8 @@
     [
       "@semantic-release/github",
       {
-        "assets": ["dist/nettle-pay-for-woocommerce.zip"]
+        "assets": ["dist/nettle-pay-for-woocommerce.zip"],
+        "releasedLabels": ["🚀 released"]
       }
     ],
   ]
