@@ -7,7 +7,7 @@
     [
         "@semantic-release/exec",
         {
-          "prepareCmd": "./bin/update_readme.sh ${nextRelease.version}",
+          "prepareCmd": "./bin/update_version.sh ${nextRelease.version}",
           "publishCmd": "./bin/build.sh"
         }
     ],
