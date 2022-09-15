@@ -14,7 +14,7 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["src/README.txt", "CHANGELOG.md"],
+        "assets": ["src/nettle-pay.php", "src/README.txt", "CHANGELOG.md"],
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
       }
     ],
