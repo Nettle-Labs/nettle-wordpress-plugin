@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.1...v1.2.2) (2022-09-15)
+
+
+### Bug Fixes
+
+* commit nettle-pay.php when updating version ([#4](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/4)) ([c76fbcd](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/c76fbcd9c9df66f829b53d068e98294aedb35ceb))
+
 ## [1.2.1](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.0...v1.2.1) (2022-09-15)
 
 
