@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.0...v1.2.1) (2022-09-15)
+
+
+### Bug Fixes
+
+* update version in init class ([#3](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/3)) ([01c69d5](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/01c69d58a66ef81f7ac046d3650e53d5157e7a7b))
+
 # [1.2.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.1.0...v1.2.0) (2022-09-12)
 
 
