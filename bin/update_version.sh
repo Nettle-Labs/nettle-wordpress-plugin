@@ -2,20 +2,20 @@
 
 source ./bin/set_vars.sh
 
-# Public: Updates the src/README.txt version
+# Public: Updates the src/README.txt "Stable Version" and the plugin class "Version"
 #
 # $1 - The version to bump.
 #
 # Examples
 #
-#   ./bin/update_readme.sh "1.0.0"
+#   ./bin/update_version.sh "1.0.0"
 #
 # Returns exit code 0 if successful, or 1 if the semantic version is incorrectly formatted.
 function main {
   set_vars
 
   if [ -z "${1}" ]; then
-    printf "%b no version specified, use: ./bin/update_readme.sh [version] \n" "${ERROR_PREFIX}"
+    printf "%b no version specified, use: ./bin/update_version.sh [version] \n" "${ERROR_PREFIX}"
     exit 1
   fi
 
@@ -27,6 +27,9 @@ function main {
 
   printf "%b updating readme.txt to version '%s' \n" "${INFO_PREFIX}" "${1}"
   sed -i -e "s/Stable tag:.*/Stable tag: ${1}/" src/README.txt
+
+  printf "%b updating nettle-pay.php to version '%s' \n" "${INFO_PREFIX}" "${1}"
+  sed -i -e "s/Version:.*/Version:           ${1}/" src/nettle-pay.php
 
   exit 0
 }
