@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.2...v1.2.3) (2022-09-17)
+
+
+### Performance Improvements
+
+* setup pipeline to upload word press plugin to svn ([#5](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/5)) ([5cac176](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/5cac1762b1492569aeefd12c2d659941095cc9e4))
+
 ## [1.2.2](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.1...v1.2.2) (2022-09-15)
 
 
