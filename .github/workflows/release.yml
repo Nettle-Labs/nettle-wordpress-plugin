@@ -7,12 +7,8 @@ on:
 
 jobs:
   release:
-    name: Release
+    name: "Release"
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
     steps:
       - name: "🛎 Checkout"
         uses: actions/checkout@v3
@@ -24,5 +20,6 @@ jobs:
         run: npm install semantic-release @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/exec @semantic-release/git @semantic-release/github @semantic-release/release-notes-generator --no-save
       - name: "🔖 Release"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # use custom PAT to trigger a workflow for release: [publish] event, see https://github.com/semantic-release/github#github-authentication for more details
+          GITHUB_TOKEN: ${{ secrets.READ_AND_WRITE_REPOS_TOKEN }}
         run: npx semantic-release
