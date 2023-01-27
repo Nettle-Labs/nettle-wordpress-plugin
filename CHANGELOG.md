@@ -1,3 +1,21 @@
+# [2.0.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.3...v2.0.0) (2023-01-27)
+
+
+### Features
+
+* update api url paths to use new public app ([#6](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/6)) ([b312971](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/b312971dab924cd6aee4f92649b637ba67b77960))
+
+
+### BREAKING CHANGES
+
+* old api path no longer available
+
+* fix: decrease icon size
+
+* ci: use nettle-bot to handle releases
+
+* chore: squash
+
 ## [1.2.3](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.2...v1.2.3) (2022-09-17)
 
 

@@ -10,7 +10,7 @@
  * Plugin Name:       Nettle Pay
  * Plugin URI:        https://nettlelabs.com/pay
  * Description:       Nettle makes it easy to take crypto payments globally, reward customers and reduce your CO2e emissions, all in one place.
- * Version:           1.2.3
+ * Version:           2.0.0
  * Author:            Nettle Labs Ltd
  * Author URI:        https://nettlelabs.com
  * License:           GPL-2.0+
