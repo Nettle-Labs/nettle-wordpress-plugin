@@ -47,7 +47,7 @@ function nettle_pay_init() {
              */
             public function __construct() {
                 $this->id = 'nettle_pay';
-                $this->icon = apply_filters('woocommerce_nettle_pay_icon', plugin_dir_url(__FILE__) . 'assets/images/nettle_icon.png');
+                $this->icon = apply_filters('woocommerce_nettle_pay_icon', plugin_dir_url(__FILE__) . 'assets/images/nettle_icon-64x64.png');
                 $this->has_fields = false;
                 $this->method_title = __('Nettle Pay', 'nettle_pay'); // admin title
                 $this->method_description = '<p>' . __('Accept cryptocurrency, reward customers and reduce your CO2e emissions.', 'nettle_pay') . '</p>';  // admin description
