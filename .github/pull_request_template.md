@@ -19,5 +19,5 @@ The title should summarise what the purpose of this change,
 - [ ] ⚡ Improve performance
 - [ ] ✨ New feature (non-breaking change which adds functionality)
 - [ ] ♻ Refactor
-- [ ] ⏪️Revert changes
+- [ ] ⏪️ Revert changes
 - [ ] 🔧 Task (a small and general change)
