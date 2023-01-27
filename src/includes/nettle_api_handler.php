@@ -29,7 +29,7 @@ class Nettle_API_Handler {
             'headers' => $headers,
             'timeout' => 120
         );
-        $response = wp_remote_post(self::$api_url.'/checkout/payment', $args);
+        $response = wp_remote_post(self::$api_url.'/apps/public/checkout/payment', $args);
 
         if (is_wp_error($response)) {
             self::log("[INFO] HTTP Failed: " . $response->get_error_message());
@@ -59,7 +59,7 @@ class Nettle_API_Handler {
             'headers' => $headers,
             'timeout' => 120
         );
-        $response = wp_remote_get(self::$api_url . '/currency/' . $currencyCode, $args);
+        $response = wp_remote_get(self::$api_url . '/apps/public/currency/' . $currencyCode, $args);
 
         if (is_wp_error($response)) {
             self::log("[INFO] HTTP failed: " . $response->get_error_message());
