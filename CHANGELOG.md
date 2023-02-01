@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.1.0...v2.1.1) (2023-02-01)
+
+
+### Bug Fixes
+
+* urls ([#8](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/8)) ([3017623](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/301762392507ac1ad633cdb88f6c8cff3424f310))
+
 # [2.1.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.0.0...v2.1.0) (2023-02-01)
 
 
