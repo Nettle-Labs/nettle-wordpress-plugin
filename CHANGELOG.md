@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.0.0...v2.1.0) (2023-02-01)
+
+
+### Features
+
+* add merchant dashboard ([#7](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/7)) ([f9670f6](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/f9670f69ddd56bd453657df7a7ca7a49c136602b))
+
 # [2.0.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v1.2.3...v2.0.0) (2023-01-27)
 
 
