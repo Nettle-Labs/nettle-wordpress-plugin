@@ -46,6 +46,7 @@ To use this plugin with your WooCommerce store you will need:
 
 * WordPress(https://wordpress.org/) - tested from 4.9, tested up to 5.8.2
 * WooCommerce(https://wordpress.org/plugins/woocommerce/ - tested from 3.0.9, tested up to 5.9.0
+* Setup an account with Nettle (https://app.beta.nettlelabs.com/merchant) 
 
 = Automatic installation =
 
@@ -62,7 +63,8 @@ The manual installation method involves downloading our plugin and uploading it 
 * Enable/disable the extension.
 * Customize the "Pay now" button label on the checkout screen.
 * Modify the API URL, this is usually for testing purposes.
-* Add your merchant API key ID and API secret.
+* Create your API key and Secret from the Nettle Dashboard (https://app.beta.nettlelabs.com/merchant/keys)
+* Add your merchant API key ID and API secret. 
 * Enable/disable logging.
 * Press the "Save Changes" button, to update any changes.
 
