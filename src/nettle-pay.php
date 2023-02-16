@@ -220,7 +220,7 @@ function nettle_pay_init() {
                 }
 
                 // create a nonce to use on the callback url
-                $nonce = substr(str_shuffle(md5(microtime())), 0, 12);
+                $nonce = substr(str_shuffle(md5(microtime())), 0, 32);
 
                 wc_add_order_item_meta($order_id, 'ipn_nonce', $nonce);
 
