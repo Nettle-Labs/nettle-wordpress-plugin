@@ -220,7 +220,7 @@ function nettle_pay_init() {
                 }
 
                 // create a nonce to use on the callback url
-                $nonce = substr(str_shuffle(md5(microtime())), 0, 12);
+                $nonce = substr(str_shuffle(md5(microtime())), 0, 32);
 
                 wc_add_order_item_meta($order_id, 'ipn_nonce', $nonce);
 
@@ -238,14 +238,17 @@ function nettle_pay_init() {
                 self::log('[INFO] process_payment(): got currency response: ' . print_r($response, true));
 
                 $requestParams = array(
-                    "callbackUrl" => get_bloginfo('url') . '/?wc-api=nettle_pay_webhook&nonce=' . $nonce . '&order_id=' . $order_id,
                     "cancelUrl" => $this->get_cancel_url($order),
                     "payment" => array(
                         "atomicAmount" => $order->get_total() * pow(10, $response['decimal']),
                         "baseCurrencyCode" => $response['code'],
                     ),
-                    "externalId" => (string) $order_id,
                     "successUrl" => $this->get_return_url($order),
+                    "wordPressOrder" => array(
+                        "nonce" => (string) $nonce,
+                        "webhookUrl" => get_bloginfo('url'),
+                        "wpOrderId" => (string) $order_id,
+                    ),
                 );
 
                 self::log('[INFO] process_payment(): attempting to generate payment for order id "' . $order_id . '"...');
