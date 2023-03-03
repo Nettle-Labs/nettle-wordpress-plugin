@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.1.1...v2.2.0) (2023-03-03)
+
+
+### Features
+
+* use new wordpress order when making requests ([#9](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/9)) ([7bf261a](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/7bf261a6236a8bcf50d4711c4959982caabbdbb7))
+
 ## [2.1.1](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.1.0...v2.1.1) (2023-02-01)
 
 
