@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.2.0...v2.3.0) (2023-03-09)
+
+
+### Features
+
+* add extra details to wordpress order ([#10](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/10)) ([b1eb1a4](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/b1eb1a446e38735216bf3e2124ef220c110aae2b))
+
 # [2.2.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.1.1...v2.2.0) (2023-03-03)
 
 
