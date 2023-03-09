@@ -70,7 +70,68 @@ function nettle_pay_init() {
                 }
 
                 add_action('woocommerce_api_nettle_pay_webhook', array($this, 'check_ipn_response'));
+                add_action('woocommerce_admin_order_data_after_order_details', array($this, 'update_order_extra_details'));
             }
+
+            /**
+             * Private functions
+             */
+
+            /**
+             * Convenience function to convert an atomic unit to a standard unit.
+             * @param int $atomic_amount The atomic amount
+             * @param int $decimal The decimal to use in the conversion
+             * @return float|int the supplied atomic unit as a standard unit
+             */
+            private function calculateStandardUnit($atomic_amount, $decimal) {
+                $power = pow(10, $decimal);
+
+                return $atomic_amount / $power;
+            }
+
+            /**
+             * Creates an url for the transaction.
+             * @param string $chain The chain for the transaction.
+             * @param string $transaction_id The transaction ID.
+             * @return string|null the url for the transaction or null
+             */
+            private function create_chain_transaction_url($chain, $transaction_id) {
+                switch ($chain) {
+                    case 'AlgorandMainNet':
+                        return 'https://algoexplorer.io/tx/' . $transaction_id;
+                    case 'AlgorandTestNet':
+                        return 'https://testnet.algoexplorer.io/tx/' . $transaction_id;
+                    case 'EthereumGoreli':
+                        return 'https://goerli.etherscan.io/tx/' . $transaction_id;
+                    case 'EthereumMainNet':
+                        return 'https://etherscan.io/tx/' . $transaction_id;
+                    default:
+                        return null;
+                }
+            }
+
+            /**
+             * Updates the meta, if it exists, otherwise it adds it.
+             * @param int $order_id The order the meta is stored.
+             * @param string $key The key for the meta
+             * @param mixed $value The value to add/update
+             * @return void
+             */
+            private function upsert_order_item_meta($order_id, $key, $value) {
+                $existing_value = wc_get_order_item_meta($order_id, $key);
+
+                if ($existing_value != null) {
+                    wc_update_order_item_meta($order_id, $key, $value);
+
+                    return;
+                }
+
+                wc_add_order_item_meta($order_id, $key, $value);
+            }
+
+            /**
+             * Protected functions
+             */
 
             /**
              * Init the Nettle API class.
@@ -85,11 +146,21 @@ function nettle_pay_init() {
             }
 
             /**
+             * Public functions
+             */
+
+            /**
              * Handle requests sent to webhook.
              */
             public function check_ipn_response() {
+                $chain = isset($_REQUEST['chain']) ? sanitize_text_field($_REQUEST['chain']) : null;
+                $chain_transaction_id = isset($_REQUEST['chain_transaction_id']) ? sanitize_text_field($_REQUEST['chain_transaction_id']) : null;
+                $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field($_REQUEST['nonce']) : null;
                 $order_id = isset($_REQUEST['order_id']) ? sanitize_title($_REQUEST['order_id']) : null;
-                $nonce = isset($_REQUEST['nonce']) ? sanitize_title($_REQUEST['nonce']) : null;
+                $token_amount = isset($_REQUEST['token_amount']) ? sanitize_title($_REQUEST['token_amount']) : null;
+                $token_code = isset($_REQUEST['token_code']) ? sanitize_text_field($_REQUEST['token_code']) : null;
+                $token_decimal = isset($_REQUEST['token_decimal']) ? sanitize_title($_REQUEST['token_decimal']) : null;
+                $transaction_id = isset($_REQUEST['transaction_id']) ? sanitize_text_field($_REQUEST['transaction_id']) : null;
 
                 if (is_null($order_id)) {
                     self::log('[INFO] check_ipn_response(): no order id found');
@@ -108,10 +179,52 @@ function nettle_pay_init() {
                 }
 
                 $order = wc_get_order($order_id);
+
+                // add/update the order with the transaction data
+                self::upsert_order_item_meta($order_id, 'chain', $chain);
+                self::upsert_order_item_meta($order_id, 'chain_transaction_id', $chain_transaction_id);
+                self::upsert_order_item_meta($order_id, 'token_amount', $token_amount);
+                self::upsert_order_item_meta($order_id, 'token_code', $token_code);
+                self::upsert_order_item_meta($order_id, 'token_decimal', $token_decimal);
+                self::upsert_order_item_meta($order_id, 'transaction_id', $transaction_id);
+
+                // complete order
                 $order->payment_complete();
                 $order->reduce_order_stock();
 
                 update_option('webhook_debug', $_REQUEST);
+
+                self::log('[INFO] check_ipn_response(): updating order "' . $order_id . '" details');
+
+                do_action('woocommerce_admin_order_data_after_order_details', $order);
+            }
+
+            /**
+             * Updates the order details with extra information.
+             * @param WC_Order $order Order object.
+             * @return void
+             */
+            public function update_order_extra_details($order) {
+                $amount = self::calculateStandardUnit((int)wc_get_order_item_meta($order->id, 'token_amount'), (int)wc_get_order_item_meta($order->id, 'token_decimal'));
+                $chain_transaction_id = wc_get_order_item_meta($order->id, 'chain_transaction_id');
+                $chain_transaction_url = null;
+
+                if ($chain_transaction_id != null) {
+                    $chain_transaction_url = self::create_chain_transaction_url(wc_get_order_item_meta($order->id, 'chain'), $chain_transaction_id);
+                }
+
+                ?>
+                <div class="form-field form-field-wide">
+                <?php
+                    echo '<p><strong>' . __( 'Nettle Pay Amount' ) . ':</strong> ' . $amount . ' ' . wc_get_order_item_meta($order->id, 'token_code')  . '</p>';
+                    echo '<p><strong>' . __( 'Nettle Pay Transaction ID' ) . ':</strong> ' . wc_get_order_item_meta($order->id, 'transaction_id') . '</p>';
+
+                    if ($chain_transaction_url != null) {
+                        echo '<p><strong>' . __( 'Chain Transaction ID' ) . ':</strong> ' . '<a href="' . $chain_transaction_url . '" target="_blank">' . $chain_transaction_id . '</a>' . '</p>';
+                    }
+                ?>
+                </div>
+                <?php
             }
 
             /**
