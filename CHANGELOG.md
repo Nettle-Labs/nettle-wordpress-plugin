@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.3.0...v2.4.0) (2023-03-13)
+
+
+### Features
+
+* allow selection of post payment status ([#11](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/11)) ([9e2bf0e](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/9e2bf0ebed4a1589cfec48d223f75d30d341ba42))
+
 # [2.3.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.2.0...v2.3.0) (2023-03-09)
 
 
