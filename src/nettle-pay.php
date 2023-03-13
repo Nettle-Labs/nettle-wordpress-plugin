@@ -83,7 +83,7 @@ function nettle_pay_init() {
              * @param int $decimal The decimal to use in the conversion
              * @return float|int the supplied atomic unit as a standard unit
              */
-            private function calculateStandardUnit($atomic_amount, $decimal) {
+            private function calculate_standard_unit($atomic_amount, $decimal) {
                 $power = pow(10, $decimal);
 
                 return $atomic_amount / $power;
@@ -163,22 +163,23 @@ function nettle_pay_init() {
                 $transaction_id = isset($_REQUEST['transaction_id']) ? sanitize_text_field($_REQUEST['transaction_id']) : null;
 
                 if (is_null($order_id)) {
-                    self::log('[INFO] check_ipn_response(): no order id found');
+                    self::log('check_ipn_response(): no order id found');
                     return;
                 }
 
                 if (is_null($nonce)) {
-                    self::log('[INFO] check_ipn_response(): no nonce found');
+                    self::log('check_ipn_response(): no nonce found');
                     return;
                 }
 
                 // check the nonce in the order metadata matches the incoming nonce
                 if (wc_get_order_item_meta($order_id, 'ipn_nonce') != $nonce) {
-                    self::log('[INFO] check_ipn_response(): the incoming nonce does not match the nonce of the order');
+                    self::log('check_ipn_response(): the incoming nonce does not match the nonce of the order');
                     return;
                 }
 
                 $order = wc_get_order($order_id);
+                $post_payment_order_status = $this->get_option('post_payment_order_status', 'processing');
 
                 // add/update the order with the transaction data
                 self::upsert_order_item_meta($order_id, 'chain', $chain);
@@ -192,39 +193,19 @@ function nettle_pay_init() {
                 $order->payment_complete();
                 $order->reduce_order_stock();
 
-                update_option('webhook_debug', $_REQUEST);
+                // update the status to the post payment status, if necessary
+                if ($post_payment_order_status != $order->get_status()) {
+                     self::log('check_ipn_response(): updating order status to "' . $post_payment_order_status . '"');
 
-                self::log('[INFO] check_ipn_response(): updating order "' . $order_id . '" details');
-
-                do_action('woocommerce_admin_order_data_after_order_details', $order);
-            }
-
-            /**
-             * Updates the order details with extra information.
-             * @param WC_Order $order Order object.
-             * @return void
-             */
-            public function update_order_extra_details($order) {
-                $amount = self::calculateStandardUnit((int)wc_get_order_item_meta($order->id, 'token_amount'), (int)wc_get_order_item_meta($order->id, 'token_decimal'));
-                $chain_transaction_id = wc_get_order_item_meta($order->id, 'chain_transaction_id');
-                $chain_transaction_url = null;
-
-                if ($chain_transaction_id != null) {
-                    $chain_transaction_url = self::create_chain_transaction_url(wc_get_order_item_meta($order->id, 'chain'), $chain_transaction_id);
+                     $order->update_status($post_payment_order_status);
                 }
 
-                ?>
-                <div class="form-field form-field-wide">
-                <?php
-                    echo '<p><strong>' . __( 'Nettle Pay Amount' ) . ':</strong> ' . $amount . ' ' . wc_get_order_item_meta($order->id, 'token_code')  . '</p>';
-                    echo '<p><strong>' . __( 'Nettle Pay Transaction ID' ) . ':</strong> ' . wc_get_order_item_meta($order->id, 'transaction_id') . '</p>';
+                update_option('webhook_debug', $_REQUEST);
 
-                    if ($chain_transaction_url != null) {
-                        echo '<p><strong>' . __( 'Chain Transaction ID' ) . ':</strong> ' . '<a href="' . $chain_transaction_url . '" target="_blank">' . $chain_transaction_id . '</a>' . '</p>';
-                    }
-                ?>
-                </div>
-                <?php
+                self::log('check_ipn_response(): updating order "' . $order_id . '" details');
+
+                // update the order details
+                do_action('woocommerce_admin_order_data_after_order_details', $order);
             }
 
             /**
@@ -243,50 +224,61 @@ function nettle_pay_init() {
             }
 
             /**
-             * Initialise Gateway Settings Form Fields.
+             * Initialise gateway settings form fields.
              */
             public function init_form_fields() {
                 $this->form_fields = array(
                     'enabled' => array(
-                        'title' => __('Enable/Disable', 'nettle_pay') ,
-                        'type' => 'checkbox',
-                        'label' => __('Enable Nettle Pay', 'nettle_pay') ,
                         'default' => 'yes',
+                        'label' => __('Enable Nettle Pay', 'nettle_pay'),
+                        'title' => __('Enable/Disable', 'nettle_pay'),
+                        'type' => 'checkbox',
                     ),
                     'order_button_text' => array(
-                        'title' => __('Button Text', 'nettle_pay') ,
-                        'type' => 'text',
-                        'description' => __('This controls what the text the customer sees on the pay button.', 'nettle_pay') ,
-                        'default' => __('Pay with Nettle', 'nettle_pay') ,
+                        'default' => __('Pay with Nettle', 'nettle_pay'),
                         'desc_tip' => true,
+                        'description' => __('This controls what the text the customer sees on the pay button.', 'nettle_pay'),
+                        'title' => __('Button Text', 'nettle_pay'),
+                        'type' => 'text',
                     ),
                     'api_url' => array(
-                        'title' => __('API URL', 'nettle_pay') ,
-                        'type' => 'text',
                         'default' => 'https://api.nettlelabs.com',
                         'desc_tip' => true,
                         'description' => __('Changes where requests are sent. You should not have to change this.', 'nettle_pay'),
+                        'title' => __('API URL', 'nettle_pay'),
+                        'type' => 'text',
                     ),
                     'api_key_id' => array(
-                        'title' => __('API Key ID', 'nettle_pay') ,
-                        'type' => 'text',
                         'default' => '',
                         'desc_tip' => true,
                         'description' => __('Your API key ID. Used to authenticate requests to the Nettle API.', 'nettle_pay'),
+                        'title' => __('API Key ID', 'nettle_pay'),
+                        'type' => 'text',
                     ),
                     'api_key_secret' => array(
-                        'title' => __('API Key Secret', 'nettle_pay') ,
-                        'type' => 'password',
                         'default' => '',
                         'desc_tip' => true,
                         'description' => __('Your API key secret. Used to authenticate requests to the Nettle API.', 'nettle_pay'),
+                        'title' => __('API Key Secret', 'nettle_pay'),
+                        'type' => 'password',
                     ),
+                    'post_payment_order_status' => array(
+                         'default' => 'processing',
+                         'desc_tip' => true,
+                         'description' => __('Order status when payment has successfully completed. The default is "Processing".', 'nettle_pay'),
+                         'options' => array(
+                              'processing' => 'Processing',
+                              'completed' => 'Completed'
+                         ),
+                        'title' => __('Post-payment Order Status', 'nettle_pay') ,
+                        'type' => 'select',
+                    ) ,
                     'logging' => array(
-                        'title' => __('Enable/Disable Logging', 'nettle_pay') ,
-                        'type' => 'checkbox',
-                        'label' => __('Enable Logging', 'nettle_pay') ,
                         'default' => 'no',
-                        'description' => sprintf(__('Logs events inside %s', 'nettle_pay') , '<code>' . WC_Log_Handler_File::get_log_file_path('nettle_pay_log') . '</code>') ,
+                        'description' => sprintf(__('Logs events inside %s', 'nettle_pay') , '<code>' . WC_Log_Handler_File::get_log_file_path('nettle_pay_log') . '</code>'),
+                        'label' => __('Enable Logging', 'nettle_pay'),
+                        'title' => __('Enable/Disable Logging', 'nettle_pay'),
+                        'type' => 'checkbox',
                     ),
                 );
             }
@@ -318,17 +310,17 @@ function nettle_pay_init() {
             public function process_payment($order_id) {
                 global $woocommerce;
 
-                self::log('[INFO] started process_payment() with order id: "' . $order_id . '"...');
+                self::log('started process_payment() with order id: "' . $order_id . '"...');
 
                 if (empty($order_id)) {
-                    self::log('[ERROR] process_payment(): order id is missing');
+                    self::log('process_payment(): order id is missing');
                     throw new \Exception('Order ID is missing, validation failed.');
                 }
 
                 $order = wc_get_order($order_id);
 
                 if (false === $order) {
-                    self::log('[ERROR] process_payment(): failed to get order details for order id "' . $order_id . '"');
+                    self::log('process_payment(): failed to get order details for order id "' . $order_id . '"');
                     throw new \Exception('Unable to retrieve the order details for order ID "' . $order_id . '", Unable to proceed.');
                 }
 
@@ -339,16 +331,16 @@ function nettle_pay_init() {
 
                 $this->init_api();
 
-                self::log('[INFO] process_payment(): getting currency details for "' . get_woocommerce_currency() . '"...');
+                self::log('process_payment(): getting currency details for "' . get_woocommerce_currency() . '"...');
 
                 $response = Nettle_API_Handler::findCurrencyByCode(get_woocommerce_currency());
 
                 if (is_null($response)) {
-                    self::log('[ERROR] process_payment(): unable to find currency "' . get_woocommerce_currency() . '"');
+                    self::log('process_payment(): unable to find currency "' . get_woocommerce_currency() . '"');
                     throw new \Exception('Currency "' . get_woocommerce_currency() . '" not supported.');
                 }
 
-                self::log('[INFO] process_payment(): got currency response: ' . print_r($response, true));
+                self::log('process_payment(): got currency response: ' . print_r($response, true));
 
                 $requestParams = array(
                     "cancelUrl" => $this->get_cancel_url($order),
@@ -364,11 +356,11 @@ function nettle_pay_init() {
                     ),
                 );
 
-                self::log('[INFO] process_payment(): attempting to generate payment for order id "' . $order_id . '"...');
+                self::log('process_payment(): attempting to generate payment for order id "' . $order_id . '"...');
 
                 $response = Nettle_API_Handler::createPayment($requestParams);
 
-                self::log('[INFO] process_payment(): got payment response: ' . print_r($response, true));
+                self::log('process_payment(): got payment response: ' . print_r($response, true));
 
                 if (empty($response['url'])) {
                     return array(
@@ -381,6 +373,34 @@ function nettle_pay_init() {
                     'redirect' => $response['url'],
                 );
             }
+
+             /**
+              * Updates the order details with extra information.
+              * @param WC_Order $order Order object.
+              * @return void
+              */
+             public function update_order_extra_details($order) {
+                  $amount = self::calculate_standard_unit((int)wc_get_order_item_meta($order->id, 'token_amount'), (int)wc_get_order_item_meta($order->id, 'token_decimal'));
+                  $chain_transaction_id = wc_get_order_item_meta($order->id, 'chain_transaction_id');
+                  $chain_transaction_url = null;
+
+                  if ($chain_transaction_id != null) {
+                       $chain_transaction_url = self::create_chain_transaction_url(wc_get_order_item_meta($order->id, 'chain'), $chain_transaction_id);
+                  }
+
+                  ?>
+                  <div class="form-field form-field-wide">
+                       <?php
+                       echo '<p><strong>' . __('Nettle Pay Amount') . ':</strong> ' . $amount . ' ' . wc_get_order_item_meta($order->id, 'token_code')  . '</p>';
+                       echo '<p><strong>' . __('Nettle Pay Transaction ID') . ':</strong> ' . wc_get_order_item_meta($order->id, 'transaction_id') . '</p>';
+
+                       if ($chain_transaction_url != null) {
+                            echo '<p><strong>' . __('Chain Transaction ID') . ':</strong> ' . '<a href="' . $chain_transaction_url . '" target="_blank">' . $chain_transaction_id . '</a>' . '</p>';
+                       }
+                       ?>
+                  </div>
+                  <?php
+             }
         }
     }
     else {
@@ -391,7 +411,6 @@ function nettle_pay_init() {
         }
 
         $plugins_url = admin_url('plugins.php');
-
         $plugins = get_plugins();
 
         foreach ($plugins as $file => $plugin) {
@@ -407,6 +426,7 @@ function nettle_pay_init() {
  * Add the Nettle Pay gateway to the WooCommerce gateways
  */
 add_filter('woocommerce_payment_gateways', 'add_nettle_pay_gateway');
+
 function add_nettle_pay_gateway($gateways) {
     $gateways[] = 'WC_Nettle_Pay_Gateway';
     return $gateways;
