@@ -111,25 +111,6 @@ function nettle_pay_init() {
             }
 
             /**
-             * Updates the meta, if it exists, otherwise it adds it.
-             * @param int $order_id The order the meta is stored.
-             * @param string $key The key for the meta
-             * @param mixed $value The value to add/update
-             * @return void
-             */
-            private function upsert_order_item_meta($order_id, $key, $value) {
-                $existing_value = wc_get_order_item_meta($order_id, $key);
-
-                if ($existing_value != null) {
-                    wc_update_order_item_meta($order_id, $key, $value);
-
-                    return;
-                }
-
-                wc_add_order_item_meta($order_id, $key, $value);
-            }
-
-            /**
              * Protected functions
              */
 
@@ -182,12 +163,11 @@ function nettle_pay_init() {
                 $post_payment_order_status = $this->get_option('post_payment_order_status', 'processing');
 
                 // add/update the order with the transaction data
-                self::upsert_order_item_meta($order_id, 'chain', $chain);
-                self::upsert_order_item_meta($order_id, 'chain_transaction_id', $chain_transaction_id);
-                self::upsert_order_item_meta($order_id, 'token_amount', $token_amount);
-                self::upsert_order_item_meta($order_id, 'token_code', $token_code);
-                self::upsert_order_item_meta($order_id, 'token_decimal', $token_decimal);
-                self::upsert_order_item_meta($order_id, 'transaction_id', $transaction_id);
+                update_post_meta($order_id, 'chain', $chain);
+                update_post_meta($order_id, 'chain_transaction_id', $chain_transaction_id);
+                update_post_meta($order_id, 'token_amount', self::calculate_standard_unit((int)$token_amount, (int)$token_decimal));
+                update_post_meta($order_id, 'token', $token_code);
+                update_post_meta($order_id, 'nettle_transaction_id', $transaction_id);
 
                 // complete order
                 $order->payment_complete();
@@ -380,19 +360,18 @@ function nettle_pay_init() {
               * @return void
               */
              public function update_order_extra_details($order) {
-                  $amount = self::calculate_standard_unit((int)wc_get_order_item_meta($order->id, 'token_amount'), (int)wc_get_order_item_meta($order->id, 'token_decimal'));
-                  $chain_transaction_id = wc_get_order_item_meta($order->id, 'chain_transaction_id');
+                  $chain_transaction_id = $order->get_meta('chain_transaction_id');
                   $chain_transaction_url = null;
 
                   if ($chain_transaction_id != null) {
-                       $chain_transaction_url = self::create_chain_transaction_url(wc_get_order_item_meta($order->id, 'chain'), $chain_transaction_id);
+                       $chain_transaction_url = self::create_chain_transaction_url($order->get_meta('chain'), $chain_transaction_id);
                   }
 
                   ?>
                   <div class="form-field form-field-wide">
                        <?php
-                       echo '<p><strong>' . __('Nettle Pay Amount') . ':</strong> ' . $amount . ' ' . wc_get_order_item_meta($order->id, 'token_code')  . '</p>';
-                       echo '<p><strong>' . __('Nettle Pay Transaction ID') . ':</strong> ' . wc_get_order_item_meta($order->id, 'transaction_id') . '</p>';
+                       echo '<p><strong>' . __('Nettle Pay Amount') . ':</strong> ' . $order->get_meta('token_amount') . ' ' . $order->get_meta('token')  . '</p>';
+                       echo '<p><strong>' . __('Nettle Pay Transaction ID') . ':</strong> ' . $order->get_meta('nettle_transaction_id') . '</p>';
 
                        if ($chain_transaction_url != null) {
                             echo '<p><strong>' . __('Chain Transaction ID') . ':</strong> ' . '<a href="' . $chain_transaction_url . '" target="_blank">' . $chain_transaction_id . '</a>' . '</p>';
