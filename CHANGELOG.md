@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.4.0...v2.5.0) (2023-03-24)
+
+
+### Features
+
+* use post meta data for nettle transaction data ([#12](https://github.com/Nettle-Labs/nettle-wordpress-plugin/issues/12)) ([05681eb](https://github.com/Nettle-Labs/nettle-wordpress-plugin/commit/05681eb27d209885ca0f488604f10b3320efa0d1))
+
 # [2.4.0](https://github.com/Nettle-Labs/nettle-wordpress-plugin/compare/v2.3.0...v2.4.0) (2023-03-13)
 
 
